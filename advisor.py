@@ -19,13 +19,14 @@ def ask_chatGPT(uv_index, temperature, skin_type, age, gender, skin_conditions):
 		Provide a short and clear advice (max 2 sentences) for a {age}-year-old {gender} with {skin_type} skin and {skin_conditions if skin_conditions else 'no skin conditions'}.
 		The current UV index is {uv_index} and the temperature is {temperature}. 
 		The advice should include necessary skincare (like sunscreen SPF) and clothing recommendations.
-		Return the response in JSON format like this: 
+		Return the response simply in JSON format like this: 
 		{{
 			"advice": "your_advice_here",
-			"skincare": "factor_number_here",
-			"recomended_outdor_time": "time_number_here(in hours)",
+			"factor": "factor_number_here",
+			"recOutdoor": "time_number_here(in hours)",
 		}}
-		Ensure "skincare" and "recommended_outdoor_time" are numbers, not strings.
+		Ensure "skincare" and "recommended_outdoor_time" are numbers, not strings. 
+		The JSON object:\n\n`
 		"""
 
 	advice = client.chat.completions.create(
@@ -50,14 +51,14 @@ def ask_chatGPT(uv_index, temperature, skin_type, age, gender, skin_conditions):
 def get_user_data():
 	try:
 		data = request.json
-		uv_index = data["uv_index"]
-		temperature = data["temperature"]
-		skin_type = data["skin_type"]
-		age = data["age"]
-		gender = data["gender"]
+		uv_index = data["uvIndex"]
+		temperature = data["temperatureC"]
+		skin_type = data["skinType"]
+		age = data["years"]
+		gender = data["biologicalSex"]
 
-		if "skin_conditions" in data:
-			skin_conditions = data["skin_conditions"]
+		if "skinDiseases" in data:
+			skin_conditions = data["skinDiseases"]
 		else:
 			skin_conditions = None
 
