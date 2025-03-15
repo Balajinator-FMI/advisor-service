@@ -14,10 +14,10 @@ client = OpenAI(
 )
 
 
-def ask_chatGPT(uv_index, temperature, skin_type, age, gender, skin_conditions):
+def ask_chatGPT(uv_index, temperature, skin_type, age, gender, skin_conditions, weather):
 	prompt = f"""
 		Provide a short and clear advice (max 2 sentences) for a {age}-year-old {gender} with {skin_type} skin and {skin_conditions if skin_conditions else 'no skin conditions'}.
-		The current UV index is {uv_index} and the temperature is {temperature}. 
+		The current UV index is {uv_index} and the temperature is {temperature}. The weather is {weather}.
 		The advice should include necessary skincare (like sunscreen SPF) and clothing recommendations.
 		Return the response simply in JSON format like this: 
 		{{
@@ -26,23 +26,26 @@ def ask_chatGPT(uv_index, temperature, skin_type, age, gender, skin_conditions):
 			"recOutdoor": "time_number_here(in hours)",
 		}}
 		Ensure "skincare" and "recommended_outdoor_time" are numbers, not strings. 
-		The JSON object:\n\n`
 		"""
 
-	advice = client.chat.completions.create(
-		model="gpt-4o-mini",
-		store=True,
-		messages=[{"role": "system", "content": "You are a skincare and weather expert giving concise outdoor advice."},
-					{"role": "user", "content": prompt}
-		]
-	)
+	proper_response = False
 
-	advice_text = advice.choices[0].message.content
+	while not proper_response:
+		advice = client.chat.completions.create(
+			model="gpt-4o-mini",
+			store=True,
+			messages=[{"role": "system", "content": "You are a skincare and weather expert giving concise outdoor advice."},
+						{"role": "user", "content": prompt}
+			]
+		)
 
-	try:
-		advice_json = json.loads(advice_text)
-	except json.JSONDecodeError:
-		advice_json = {advice_text.strip()}
+		advice_text = advice.choices[0].message.content
+
+		try:
+			advice_json = json.loads(advice_text)
+			proper_response = True
+		except json.JSONDecodeError:
+			advice_json = {advice_text.strip()}
 
 	return advice_json
 
@@ -56,6 +59,7 @@ def get_user_data():
 		skin_type = data["skinType"]
 		age = data["years"]
 		gender = data["biologicalSex"]
+		weather = data["weather"]
 
 		if "skinDiseases" in data:
 			skin_conditions = data["skinDiseases"]
@@ -63,7 +67,7 @@ def get_user_data():
 			skin_conditions = None
 
 
-		advice = ask_chatGPT(uv_index, temperature, skin_type, age, gender, skin_conditions)
+		advice = ask_chatGPT(uv_index, temperature, skin_type, age, gender, skin_conditions, weather)
 
 		return jsonify(advice), 200
 	
