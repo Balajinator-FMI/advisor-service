@@ -19,6 +19,7 @@ def ask_chatGPT(uv_index, temperature, skin_type, age, gender, skin_conditions, 
 		Provide a short and clear advice (max 2 sentences) for a {age}-year-old {gender} with {skin_type} skin and {skin_conditions if skin_conditions else 'no skin conditions'}.
 		The current UV index is {uv_index} and the temperature is {temperature}. The weather is {weather}.
 		The advice should include necessary skincare (like sunscreen SPF) and clothing recommendations.
+		Everything should be specific to the user. Do not include the SPF in the advice string.
 		Return the response simply in JSON format like this: 
 		{{
 			"advice": "your_advice_here",
