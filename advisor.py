@@ -16,15 +16,16 @@ client = OpenAI(
 
 def ask_chatGPT(uv_index, temperature, skin_type, age, gender, skin_conditions, weather):
 	prompt = f"""
-		Provide a short and clear advice (max 2 sentences) for a {age}-year-old {gender} with {skin_type} skin and {skin_conditions if skin_conditions else 'no skin conditions'}.
+		Provide a short and clear advice (max 2 sentences) for a {age}-year-old {gender} with 
+		{skin_type} skin and {skin_conditions if skin_conditions else 'no skin conditions'}.
 		The current UV index is {uv_index} and the temperature is {temperature}. The weather is {weather}.
 		The advice should include necessary skincare (like sunscreen SPF) and clothing recommendations.
 		Everything should be specific to the user. Do not include the SPF in the advice string.
 		Return the response simply in JSON format like this: 
 		{{
 			"advice": "your_advice_here",
-			"factor": "factor_number_here",
-			"recOutdoor": "time_number_here(in hours)",
+			"factor": "factor_number_here(10, 15, 20, 30, 40, 50 or 60 based on the UV index, skin type, temperature and skin conditions)",
+			"recOutdoor": "time_number_here(before it gets too dangerous for day(max 10h) and skin)",
 		}}
 		Ensure "skincare" and "recommended_outdoor_time" are numbers, not strings. 
 		"""
@@ -35,8 +36,10 @@ def ask_chatGPT(uv_index, temperature, skin_type, age, gender, skin_conditions, 
 		advice = client.chat.completions.create(
 			model="gpt-4o-mini",
 			store=True,
-			messages=[{"role": "system", "content": "You are a skincare and weather expert giving concise outdoor advice."},
-						{"role": "user", "content": prompt}
+			messages=
+			[
+				{"role": "system", "content": "You are a skincare and weather expert giving concise outdoor advice."},
+				{"role": "user", "content": prompt}
 			]
 		)
 
